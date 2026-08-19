@@ -1,15 +1,13 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
-from streamlit_webrtc import webrtc_streamer, VideoProcessorBase
-import av
 import cv2
 import tflite_runtime.interpreter as tflite
 
 st.set_page_config(page_title="Clasificador de Imagenes IA")
 st.title("Clasificador de Imagenes con IA")
-st.markdown("Josue Elias Duron Miguel 202410010782")
-st.write("Sube una imagen o activa la camara para identificar el objeto.")
+st.markdown("Josue Duron - 202410010782")
+st.write("Sube una imagen o usa la camara para identificar el objeto.")
 
 
 @st.cache_resource
@@ -41,51 +39,23 @@ def predecir(img_array):
     return clase, confianza
 
 
-opcion = st.radio("Selecciona una opcion:", ["Camara en vivo", "Subir imagen"])
+opcion = st.radio("Selecciona una opcion:", ["Camara", "Subir imagen"])
 
-if opcion == "Camara en vivo":
-    st.write("Apunta la camara hacia un objeto y la prediccion se mostrara sobre el video.")
+imagen = None
 
-    class Procesador(VideoProcessorBase):
-        def recv(self, frame):
-            img = frame.to_ndarray(format="bgr24")
-            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            clase, confianza = predecir(img_rgb)
-            texto = f"{clase} ({confianza*100:.1f}%)"
-            cv2.putText(img, texto, (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
-                        1, (0, 255, 0), 2, cv2.LINE_AA)
-            return av.VideoFrame.from_ndarray(img, format="bgr24")
-
-    RTC_CONFIGURATION = {
-        "iceServers": [
-            {"urls": ["stun:stun.l.google.com:19302"]},
-            {"urls": ["stun:stun1.l.google.com:19302"]},
-            {
-                "urls": ["turn:openrelay.metered.ca:80"],
-                "username": "openrelayproject",
-                "credential": "openrelayproject",
-            },
-            {
-                "urls": ["turn:openrelay.metered.ca:443"],
-                "username": "openrelayproject",
-                "credential": "openrelayproject",
-            },
-        ]
-    }
-
-    webrtc_streamer(
-        key="camara-live",
-        video_processor_factory=Procesador,
-        media_stream_constraints={"video": True, "audio": False},
-        rtc_configuration=RTC_CONFIGURATION,
-    )
-
+if opcion == "Camara":
+    st.write("Apunta la camara hacia el objeto y presiona el boton para capturar. La prediccion aparecera al instante.")
+    foto = st.camera_input("Toma una foto")
+    if foto:
+        imagen = Image.open(foto).convert('RGB')
 else:
     archivo = st.file_uploader("Sube una imagen", type=["jpg", "jpeg", "png"])
     if archivo:
         imagen = Image.open(archivo).convert('RGB')
-        st.image(imagen, caption="Imagen cargada", use_container_width=True)
 
-        clase, confianza = predecir(np.array(imagen))
-        st.success(f"Prediccion: {clase}")
-        st.info(f"Confianza: {confianza*100:.2f}%")
+if imagen:
+    st.image(imagen, caption="Imagen cargada", use_container_width=True)
+
+    clase, confianza = predecir(np.array(imagen))
+    st.success(f"Prediccion: {clase}")
+    st.info(f"Confianza: {confianza*100:.2f}%")
