@@ -6,9 +6,11 @@ import av
 import cv2
 import tflite_runtime.interpreter as tflite
 
-st.set_page_config(page_title="Clasificador de Imágenes IA", page_icon="🧠")
-st.title("🧠 Clasificador de Imágenes con IA")
-st.markdown("**Desarrollado por: [TU NOMBRE AQUÍ]**")
+st.set_page_config(page_title="Clasificador de Imagenes IA")
+st.title("Clasificador de Imagenes con IA")
+st.markdown("Josue Elias Duron Miguel 202410010782")
+st.write("Sube una imagen o activa la camara para identificar el objeto.")
+
 
 @st.cache_resource
 def cargar_modelo():
@@ -16,12 +18,14 @@ def cargar_modelo():
     interpreter.allocate_tensors()
     return interpreter
 
+
 interpreter = cargar_modelo()
 entrada_info = interpreter.get_input_details()
 salida_info = interpreter.get_output_details()
 
-nombres_clases = ['Avión', 'Auto', 'Pájaro', 'Gato', 'Ciervo',
-                   'Perro', 'Rana', 'Caballo', 'Barco', 'Camión']
+nombres_clases = ['Avion', 'Auto', 'Pajaro', 'Gato', 'Ciervo',
+                   'Perro', 'Rana', 'Caballo', 'Barco', 'Camion']
+
 
 def predecir(img_array):
     img_resized = cv2.resize(img_array, (32, 32))
@@ -36,10 +40,11 @@ def predecir(img_array):
     confianza = np.max(pred)
     return clase, confianza
 
-opcion = st.radio("Selecciona una opción:", ["📷 Cámara en vivo", "📁 Subir imagen"])
 
-if opcion == "📷 Cámara en vivo":
-    st.write("Apunta la cámara hacia un objeto y la predicción se mostrará sobre el video.")
+opcion = st.radio("Selecciona una opcion:", ["Camara en vivo", "Subir imagen"])
+
+if opcion == "Camara en vivo":
+    st.write("Apunta la camara hacia un objeto y la prediccion se mostrara sobre el video.")
 
     class Procesador(VideoProcessorBase):
         def recv(self, frame):
@@ -56,11 +61,13 @@ if opcion == "📷 Cámara en vivo":
         video_processor_factory=Procesador,
         media_stream_constraints={"video": True, "audio": False},
     )
+
 else:
     archivo = st.file_uploader("Sube una imagen", type=["jpg", "jpeg", "png"])
     if archivo:
         imagen = Image.open(archivo).convert('RGB')
         st.image(imagen, caption="Imagen cargada", use_column_width=True)
+
         clase, confianza = predecir(np.array(imagen))
-        st.success(f"### Predicción: {clase}")
+        st.success(f"Prediccion: {clase}")
         st.info(f"Confianza: {confianza*100:.2f}%")
