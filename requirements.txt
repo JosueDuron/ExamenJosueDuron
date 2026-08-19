@@ -3,4 +3,4 @@ tflite-runtime
 numpy==1.26.4
 opencv-python-headless
 Pillow
- 
+streamlit-camera-input-live

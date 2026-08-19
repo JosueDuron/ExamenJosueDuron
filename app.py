@@ -3,11 +3,12 @@ import numpy as np
 from PIL import Image
 import cv2
 import tflite_runtime.interpreter as tflite
+from camera_input_live import camera_input_live
 
 st.set_page_config(page_title="Clasificador de Imagenes IA")
 st.title("Clasificador de Imagenes con IA")
 st.markdown("Josue Duron - 202410010782")
-st.write("Sube una imagen o usa la camara para identificar el objeto.")
+st.write("Sube una imagen o activa la camara en vivo para identificar el objeto.")
 
 
 @st.cache_resource
@@ -39,13 +40,13 @@ def predecir(img_array):
     return clase, confianza
 
 
-opcion = st.radio("Selecciona una opcion:", ["Camara", "Subir imagen"])
+opcion = st.radio("Selecciona una opcion:", ["Camara en vivo", "Subir imagen"])
 
 imagen = None
 
-if opcion == "Camara":
-    st.write("Apunta la camara hacia el objeto y presiona el boton para capturar. La prediccion aparecera al instante.")
-    foto = st.camera_input("Toma una foto")
+if opcion == "Camara en vivo":
+    st.write("Apunta la camara hacia el objeto. La imagen y la prediccion se actualizan automaticamente.")
+    foto = camera_input_live()
     if foto:
         imagen = Image.open(foto).convert('RGB')
 else:
@@ -54,8 +55,8 @@ else:
         imagen = Image.open(archivo).convert('RGB')
 
 if imagen:
-    st.image(imagen, caption="Imagen cargada", use_container_width=True)
-
     clase, confianza = predecir(np.array(imagen))
+
+    st.image(imagen, caption=f"Prediccion: {clase} ({confianza*100:.1f}%)", use_container_width=True)
     st.success(f"Prediccion: {clase}")
     st.info(f"Confianza: {confianza*100:.2f}%")
