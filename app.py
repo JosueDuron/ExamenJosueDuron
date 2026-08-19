@@ -66,7 +66,7 @@ else:
     archivo = st.file_uploader("Sube una imagen", type=["jpg", "jpeg", "png"])
     if archivo:
         imagen = Image.open(archivo).convert('RGB')
-        st.image(imagen, caption="Imagen cargada", use_column_width=True)
+        st.image(imagen, caption="Imagen cargada", use_container_width=True)
 
         clase, confianza = predecir(np.array(imagen))
         st.success(f"Prediccion: {clase}")
