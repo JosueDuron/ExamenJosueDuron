@@ -56,10 +56,28 @@ if opcion == "Camara en vivo":
                         1, (0, 255, 0), 2, cv2.LINE_AA)
             return av.VideoFrame.from_ndarray(img, format="bgr24")
 
+    RTC_CONFIGURATION = {
+        "iceServers": [
+            {"urls": ["stun:stun.l.google.com:19302"]},
+            {"urls": ["stun:stun1.l.google.com:19302"]},
+            {
+                "urls": ["turn:openrelay.metered.ca:80"],
+                "username": "openrelayproject",
+                "credential": "openrelayproject",
+            },
+            {
+                "urls": ["turn:openrelay.metered.ca:443"],
+                "username": "openrelayproject",
+                "credential": "openrelayproject",
+            },
+        ]
+    }
+
     webrtc_streamer(
         key="camara-live",
         video_processor_factory=Procesador,
         media_stream_constraints={"video": True, "audio": False},
+        rtc_configuration=RTC_CONFIGURATION,
     )
 
 else:
