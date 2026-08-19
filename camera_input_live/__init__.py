@@ -15,7 +15,7 @@ _component_func = components.declare_component(
 
 
 def camera_input_live(
-    debounce: int = 1000,
+    debounce: int = 300,
     height: int = 530,
     width: int = 704,
     key: Optional[str] = None,
