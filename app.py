@@ -45,7 +45,7 @@ opcion = st.radio("Selecciona una opcion:", ["Camara en vivo", "Subir imagen"])
 imagen = None
 
 if opcion == "Camara en vivo":
-    st.write("Apunta la camara hacia el objeto. La imagen y la prediccion se actualizan automaticamente.")
+    st.write("Apunta la camara hacia el objeto. Usa el boton 'Cambiar camara' para alternar entre trasera y frontal.")
     foto = camera_input_live()
     if foto:
         imagen = Image.open(foto).convert('RGB')
